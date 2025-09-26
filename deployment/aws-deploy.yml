@@ -1,0 +1,79 @@
+# AWS ECS Deployment Configuration
+version: '3.8'
+
+x-aws-vpc: "vpc-12345678"
+x-aws-cluster: "missing-person-cluster"
+
+services:
+  backend:
+    image: your-ecr-repo/missing-person-backend:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      FIREBASE_CONFIG_PATH: /app/firebase-service-account.json
+    secrets:
+      - firebase-config
+    networks:
+      - backend-network
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /ecs/missing-person-backend
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: ecs
+
+  frontend:
+    image: your-ecr-repo/missing-person-frontend:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.125'
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /ecs/missing-person-frontend
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: ecs
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-aws.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - frontend-network
+      - backend-network
+
+secrets:
+  firebase-config:
+    external: true
+
+networks:
+  frontend-network:
+    external: true
+  backend-network:
+    external: true

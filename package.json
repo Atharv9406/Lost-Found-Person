@@ -1,0 +1,47 @@
+{
+  "name": "missing-person-tracker",
+  "version": "1.0.0",
+  "description": "AI-powered web and mobile platform for tracking missing persons and lost items",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ai\"",
+    "dev:backend": "cd backend && mvn spring-boot:run",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:ai": "cd deployment/ai-service && python app.py",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && mvn clean package -DskipTests",
+    "install:all": "npm run install:frontend && npm run install:ai",
+    "install:frontend": "cd frontend && npm install",
+    "install:ai": "cd deployment/ai-service && pip install -r requirements.txt",
+    "docker:up": "cd deployment && docker-compose up -d",
+    "docker:down": "cd deployment && docker-compose down",
+    "docker:logs": "cd deployment && docker-compose logs -f"
+  },
+  "keywords": [
+    "missing-person",
+    "lost-item",
+    "ai",
+    "facial-recognition",
+    "object-detection",
+    "spring-boot",
+    "react",
+    "mongodb"
+  ],
+  "author": "Missing Person Tracker Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Atharv9406/Lost-Found-Person.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Atharv9406/Lost-Found-Person/issues"
+  },
+  "homepage": "https://github.com/Atharv9406/Lost-Found-Person#readme"
+}
